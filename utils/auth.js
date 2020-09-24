@@ -19,7 +19,6 @@ async function checkSession() {
 async function checkHasLogined() {
   const token = wx.getStorageSync('token')
   if (!token) {
-    console.info("token not found, user not logined yet");
     return false
   }
   const loggined = await checkSession()
@@ -71,23 +70,22 @@ async function login(page) {
   wx.login({
     success: function (res) {
       WXAPI.login_wx(res.code).then(function (res) {
-        if (res.code == 10000) {
+        // if (res.code == 10000) {
           // 去注册
           //_this.register(page)
-
-          return;
-        }
-        if (res.code != 0) {
-          // 登录错误
-          wx.showModal({
-            title: '无法登录',
-            content: res.msg,
-            showCancel: false
-          })
-          return;
-        }
-        wx.setStorageSync('token', res.data.token);
+          // return;
+        // }
+        // if (res.code != 0) {
+        //   // 登录错误
+        //   wx.showModal({
+        //     title: '无法登录',
+        //     content: res.msg,
+        //     showCancel: false
+        //   })
+        //   // return;
+        // }
         wx.setStorageSync('uid', res.data.uid);
+        wx.setStorageSync('token', res.data.token);
         checkUbtAccount(page);
         /*
         if ( page ) {
@@ -102,11 +100,10 @@ async function login(page) {
 async function checkUbtAccount(page) {
   var uid = wx.getStorageSync('uid');
   UBT.checkUser(uid).then(function (res) {
-    console.info("Checking if the UBT account exist for user: " + uid);
     if (res == null) {
       wx.showModal({
         title: '帐号未开通',
-        content: '请联系管理员为您的微信ID   ' + uid + '   开通帐号',
+        content: '请联系管理员为您的微信(ID:' + uid +')开通帐号',
         showCancel: false,
         success(res) {
           if (res.confirm) {
@@ -118,7 +115,6 @@ async function checkUbtAccount(page) {
           }
         }
       })
-      console.info("Logging Out");
       loginOut();
     } else {
       if (page) {

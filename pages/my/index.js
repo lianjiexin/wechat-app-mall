@@ -3,25 +3,22 @@ const CONFIG = require('../../config.js')
 const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 const TOOLS = require('../../utils/tools.js')
-
 const UBT = require('../../utils/ubt.js')
 
 Page({
   data: {
     wxlogin: true,
-
     balance: 0.00,
     freeze: 0,
-    score: 0,
-    growth: 0,
-    score_sign_continuous: 0,
-    rechargeOpen: false, // 是否开启充值[预存]功能
-
+    mubt: 0,
+    ubt: 0,
+    // score_sign_continuous: 0,
+    // rechargeOpen: false, // 是否开启充值[预存]功能
     // 用户订单统计数据
-    count_id_no_confirm: 0,
-    count_id_no_pay: 0,
-    count_id_no_reputation: 0,
-    count_id_no_transfer: 0,
+    // count_id_no_confirm: 0,
+    // count_id_no_pay: 0,
+    // count_id_no_reputation: 0,
+    // count_id_no_transfer: 0,
   },
   onLoad() {
   },
@@ -39,7 +36,7 @@ Page({
       if (isLogined) {
         _this.getUserApiInfo();
         _this.getUserAmount();
-        _this.orderStatistics();
+        // _this.orderStatistics();
       }
     })
     // 获取结算车数据，显示TabBarBadge
@@ -109,19 +106,17 @@ Page({
   getUserAmount: function () {
     var that = this;
     var uid = wx.getStorageSync('uid');
-
-    console.info('retrieving data for UID: ' + uid);
-
     UBT.retrieveUBT(uid, 'score').then(function (res) {
       that.setData({
         balance: 0, // no cash balance for now
         freeze: res.data.frozen.toFixed(2),
-        score: res.data.point.toFixed(2)
+        mubt: res.data && res.data.point ? res.data.point.toFixed(2) : 0
       });
     })
     UBT.retrieveUBT(uid, 'ubt').then(function (res) {
+
       that.setData({
-        growth: res.data.point.toFixed(2),
+        ubt: res.data && res.data.point ? res.data.point.toFixed(2) : 0
       });
     })
 

@@ -4,6 +4,6 @@ module.exports = {
   subDomain: "ubt", // 根据教程 https://www.it120.cc/help/qr6l4m.html 查看并设置你自己的 subDomain
   goodsDetailSkuShowType: 0, // 0 为点击立即购买按钮后出现规格尺寸、数量的选择； 1为直接在商品详情页面显示规格尺寸、数量的选择，而不弹框
   shopMod: 0, // 0为单店铺版本 ； 1为多店铺版本
-  //ubtDomain : '172.17.0.253:8089' //目前是本地测试地址
-  ubtDomain: '47.96.253.169:8089' //共测试机地址
+  //ubtDomain : 'http://172.17.1.174:8089' //目前是本地测试地址
+  ubtDomain: 'https://ubt.kluvy.com' //共测试机地址
 }

@@ -15,21 +15,21 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function(options) {
+  onLoad: function (options) {
 
   },
 
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
-  onReady: function() {
+  onReady: function () {
 
   },
 
   /**
    * 生命周期函数--监听页面显示
    */
-  onShow: function() {
+  onShow: function () {
     AUTH.checkHasLogined().then(isLogined => {
       if (!isLogined) {
         wx.showModal({
@@ -50,45 +50,43 @@ Page({
       }
     })
   },
-  bindSave: function(e) {
-    var that = this;
-    var ubt = e.detail.value.amount;
-
-    if (ubt == "") {
-      wx.showModal({
-        title: '错误',
-        content: '请输入UBT数量',
-        showCancel: false
+  bindSave: function (e) {
+    const ubt = e.detail.value.amount,
+      isNumber = /^(0|[1-9][0-9]*)$/;
+    ubt.replace(/\s+/g, "");
+    if (!ubt || !isNumber.test(ubt)) {
+      wx.showToast({
+        title: !ubt ? '请输入UBT数量' : '请输入正确数量',
+        icon: 'none'
       })
       return
     }
-    
+
     const uid = wx.getStorageSync('uid')
-    console.info ("exchange ubt for score: uid :" + uid );
-    UBT.exchangeUBTtoScore(uid,ubt).then(function (res) {
-      console.info(res);
-    if (res.status == 0) {
-      wx.showModal({
-        title: '成功',
-        content: '恭喜您，成功兑换'+ res.score +'MUBT',
-        showCancel: false,
-        success(res) {
-          if (res.confirm) {
-            wx.switchTab({
-              url: "/pages/my/index"
-            })
-          } else {
-            wx.navigateBack()
+    UBT.exchangeUBTtoScore(uid, ubt).then(function (res) {
+      if (res.status == 0) {
+        wx.showModal({
+          title: '成功',
+          content: '恭喜您，成功兑换' + res.mubt + 'MUBT',
+          showCancel: false,
+          success(res) {
+            if (res.confirm) {
+              wx.switchTab({
+                url: "/pages/my/index"
+              })
+            } else {
+              wx.navigateBack()
+            }
           }
-        }
-      })
-      return
-    } else {
-      wx.showToast({
-        title: "兑换失败",
-        icon: 'none'
-      })
-    }})
+        })
+        return
+      } else {
+        wx.showToast({
+          title: "兑换失败",
+          icon: 'none'
+        })
+      }
+    })
   },
   cancelLogin() {
     this.setData({

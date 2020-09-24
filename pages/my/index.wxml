@@ -18,16 +18,15 @@
       <view>冻结</view>
     </view> -->
     <!-- <view class='item' bindtap='goScore'> -->
-    <view class='item' bindtap='goScore'>
-      <view>{{score}}</view>
+    <view class='item'>
+      <view>{{mubt}}</view>
       <view>MUBT</view>
     </view>
-    <!-- <navigator url="/pages/score/growth"> -->
-    <view class='item right' bindtap='goUBT'>
-      <view>{{growth}}</view>
+    <!-- <view class='item right' bindtap='goUBT'> -->
+    <view class='item right'>
+      <view>{{ubt}}</view>
       <view>UBT</view>
     </view>
-    <!-- </navigator> -->
   </view>
   <view class="space"></view>
   <navigator url="/pages/order-list/index">
@@ -185,7 +184,7 @@
       <image class="next" src="/images/icon/next.png"></image>
     </view>
   </navigator>
-  <view class="line"></view> 
+  <view class="line"></view>
   <view class="space"></view>
   <view class="menu-item" bindtap="aboutUs">
     <view class="l">关于我们</view>
