@@ -274,7 +274,7 @@
         <view class="popup-join-btn">加入结算车</view>
       </view>
       <view class="safeAreaOldPaddingBttom safeAreaNewPaddingBttom" data-shopType="{{shopType}}" wx:if="{{shopType =='tobuy' || shopType =='toPingtuan'}}" bindtap="buyNow">
-        <view class="popup-join-btn">立即购买</view>
+        <view class="popup-join-btn">立即结算</view>
       </view>
     </view>
   </view>
