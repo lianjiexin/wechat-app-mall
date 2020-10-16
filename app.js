@@ -67,33 +67,33 @@ App({
 
   onShow(e) {
     // 保存邀请人
-    if (e && e.query && e.query.inviter_id) {
-      wx.setStorageSync('referrer', e.query.inviter_id)
-      if (e.shareTicket) {
-        wx.getShareInfo({
-          shareTicket: e.shareTicket,
-          success: res => {
-            wx.login({
-              success(loginRes) {
-                if (loginRes.code) {
-                  WXAPI.shareGroupGetScore(
-                    loginRes.code,
-                    e.query.inviter_id,
-                    res.encryptedData,
-                    res.iv
-                  ).then(_res => {
-                  }).catch(err => {
-                    console.error(err)
-                  })
-                } else {
-                  console.error('登录失败！' + loginRes.errMsg)
-                }
-              }
-            })
-          }
-        })
-      }
-    }
+    // if (e && e.query && e.query.inviter_id) {
+    //   wx.setStorageSync('referrer', e.query.inviter_id)
+    //   if (e.shareTicket) {
+    //     wx.getShareInfo({
+    //       shareTicket: e.shareTicket,
+    //       success: res => {
+    //         wx.login({
+    //           success(loginRes) {
+    //             if (loginRes.code) {
+    //               WXAPI.shareGroupGetScore(
+    //                 loginRes.code,
+    //                 e.query.inviter_id,
+    //                 res.encryptedData,
+    //                 res.iv
+    //               ).then(_res => {
+    //               }).catch(err => {
+    //                 console.error(err)
+    //               })
+    //             } else {
+    //               console.error('登录失败！' + loginRes.errMsg)
+    //             }
+    //           }
+    //         })
+    //       }
+    //     })
+    //   }
+    // }
     // 自动登录
     AUTH.checkHasLogined().then(async isLogined => {
       if (!isLogined) {

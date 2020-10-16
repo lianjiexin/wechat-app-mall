@@ -1,4 +1,5 @@
 const WXAPI = require('apifm-wxapi')
+const AUTH = require('../../utils/auth')
 const TOOLS = require('../../utils/tools.js')
 
 const APP = getApp()
@@ -29,9 +30,48 @@ Page({
 
     curPage: 1,
     pageSize: 20,
-    cateScrollTop: 0
+    cateScrollTop: 0,
   },
-
+  onLoad: function (e) {
+    wx.showShareMenu({
+      withShareTicket: true
+    })
+    const that = this
+    if (e && e.scene) {
+      const scene = decodeURIComponent(e.scene)
+      if (scene) {
+        wx.setStorageSync('referrer', scene.substring(11))
+      }
+    }
+    // wx.setNavigationBarTitle({
+    //   title: wx.getStorageSync('mallName')
+    // })
+    this.initBanners()
+    this.categories()
+    // WXAPI.goods({
+    //   recommendStatus: 1
+    // }).then(res => {
+    //   if (res.code === 0){
+    //     that.setData({
+    //       goodsRecommend: res.data
+    //     })
+    //   }      
+    // })
+    // that.getCoupons()
+    // that.getNotice()
+    // that.kanjiaGoods()
+    // that.pingtuanGoods()
+    // this.wxaMpLiveRooms()    
+  },
+  onShow(e) {
+    this.setData({
+      shopInfo: wx.getStorageSync('shopInfo')
+    })
+    // 获取购物车数据，显示TabBarBadge
+    TOOLS.showTabBarBadge()
+    // this.goodsDynamic()
+    // this.miaoshaGoods()
+  },
   tabClick: function (e) {
     wx.setStorageSync("_categoryId", e.currentTarget.id)
     wx.switchTab({
@@ -67,37 +107,7 @@ Page({
       selectCurrent: e.index
     })
   },
-  onLoad: function (e) {
-    wx.showShareMenu({
-      withShareTicket: true
-    })
-    const that = this
-    if (e && e.scene) {
-      const scene = decodeURIComponent(e.scene)
-      if (scene) {
-        wx.setStorageSync('referrer', scene.substring(11))
-      }
-    }
-    // wx.setNavigationBarTitle({
-    //   title: wx.getStorageSync('mallName')
-    // })
-    this.initBanners()
-    this.categories()
-    // WXAPI.goods({
-    //   recommendStatus: 1
-    // }).then(res => {
-    //   if (res.code === 0){
-    //     that.setData({
-    //       goodsRecommend: res.data
-    //     })
-    //   }      
-    // })
-    // that.getCoupons()
-    // that.getNotice()
-    // that.kanjiaGoods()
-    // that.pingtuanGoods()
-    // this.wxaMpLiveRooms()    
-  },
+
   // async miaoshaGoods(){
   //   const res = await WXAPI.goods({
   //     miaosha: true
@@ -142,15 +152,7 @@ Page({
     }
     this.setData(_data)
   },
-  onShow: function (e) {
-    this.setData({
-      shopInfo: wx.getStorageSync('shopInfo')
-    })
-    // 获取购物车数据，显示TabBarBadge
-    TOOLS.showTabBarBadge()
-    // this.goodsDynamic()
-    // this.miaoshaGoods()
-  },
+
   // async goodsDynamic(){
   //   const res = await WXAPI.goodsDynamic(0)
   //   if (res.code == 0) {

@@ -8,17 +8,10 @@ const UBT = require('../../utils/ubt.js')
 Page({
   data: {
     wxlogin: true,
-    balance: 0.00,
-    freeze: 0,
+    wxloginState: false,
+    wxBindingState: false,
     mubt: 0,
     ubt: 0,
-    // score_sign_continuous: 0,
-    // rechargeOpen: false, // 是否开启充值[预存]功能
-    // 用户订单统计数据
-    // count_id_no_confirm: 0,
-    // count_id_no_pay: 0,
-    // count_id_no_reputation: 0,
-    // count_id_no_transfer: 0,
   },
   onLoad() {
   },
@@ -31,18 +24,28 @@ Page({
     })
     AUTH.checkHasLogined().then(isLogined => {
       this.setData({
-        wxlogin: isLogined
+        wxlogin: isLogined,
+        wxloginState: isLogined
       })
       if (isLogined) {
+        _this.getIsRegistryCode();
         _this.getUserApiInfo();
         _this.getUserAmount();
-        // _this.orderStatistics();
       }
     })
     // 获取结算车数据，显示TabBarBadge
     TOOLS.showTabBarBadge();
   },
-  aboutUs: function () {
+  /* 查询用户注册码是否绑定 */
+  async getIsRegistryCode() {
+    const registerCode = wx.getStorageSync('uid'),
+      data = await UBT.getUidRegistryByUid(registerCode);
+    this.setData({
+      wxBindingState: data == null ? false : true
+    })
+  },
+  // 关于我们
+  aboutUs() {
     wx.showModal({
       title: '关于我们',
       content: '优贝，基于区块链智能合约的药品权证结算分发系统',
@@ -53,38 +56,6 @@ Page({
     AUTH.loginOut()
     wx.reLaunch({
       url: '/pages/my/index'
-    })
-  },
-  getPhoneNumber: function (e) {
-    if (!e.detail.errMsg || e.detail.errMsg != "getPhoneNumber:ok") {
-      wx.showModal({
-        title: '提示',
-        content: e.detail.errMsg,
-        showCancel: false
-      })
-      return;
-    }
-    WXAPI.bindMobileWxa(wx.getStorageSync('token'), e.detail.encryptedData, e.detail.iv).then(res => {
-      if (res.code === 10002) {
-        this.setData({
-          wxlogin: false
-        })
-        return
-      }
-      if (res.code == 0) {
-        wx.showToast({
-          title: '绑定成功',
-          icon: 'success',
-          duration: 2000
-        })
-        this.getUserApiInfo();
-      } else {
-        wx.showModal({
-          title: '提示',
-          content: res.msg,
-          showCancel: false
-        })
-      }
     })
   },
   getUserApiInfo: function () {
@@ -103,63 +74,18 @@ Page({
       }
     })
   },
-  getUserAmount: function () {
-    var that = this;
-    var uid = wx.getStorageSync('uid');
-    UBT.retrieveUBT(uid, 'score').then(function (res) {
+  getUserAmount() {
+    const that = this,
+      registerCode = wx.getStorageSync('registerCode');
+    UBT.retrieveUBT(registerCode, 'mubt').then(function (res) {
       that.setData({
-        balance: 0, // no cash balance for now
-        freeze: res.data.frozen.toFixed(2),
         mubt: res.data && res.data.point ? res.data.point.toFixed(2) : 0
       });
     })
-    UBT.retrieveUBT(uid, 'ubt').then(function (res) {
-
+    UBT.retrieveUBT(registerCode, 'ubt').then(function (res) {
       that.setData({
         ubt: res.data && res.data.point ? res.data.point.toFixed(2) : 0
       });
-    })
-
-  },
-  handleOrderCount: function (count) {
-    return count > 99 ? '99+' : count;
-  },
-  orderStatistics: function () {
-    WXAPI.orderStatistics(wx.getStorageSync('token')).then((res) => {
-      if (res.code == 0) {
-        const {
-          count_id_no_confirm,
-          count_id_no_pay,
-          count_id_no_reputation,
-          count_id_no_transfer,
-        } = res.data || {}
-        this.setData({
-          count_id_no_confirm: this.handleOrderCount(count_id_no_confirm),
-          count_id_no_pay: this.handleOrderCount(count_id_no_pay),
-          count_id_no_reputation: this.handleOrderCount(count_id_no_reputation),
-          count_id_no_transfer: this.handleOrderCount(count_id_no_transfer),
-        })
-      }
-    })
-  },
-  goAsset: function () {
-    wx.navigateTo({
-      url: "/pages/asset/index"
-    })
-  },
-  goScore: function () {
-    wx.navigateTo({
-      url: "/pages/score/index"
-    })
-  },
-  goUBT() {
-    wx.navigateTo({
-      url: "/pages/score/growth"
-    })
-  },
-  goOrder: function (e) {
-    wx.navigateTo({
-      url: "/pages/order-list/index?type=" + e.currentTarget.dataset.type
     })
   },
   cancelLogin() {
@@ -182,23 +108,23 @@ Page({
     }
     AUTH.register(this);
   },
-  scanOrderCode() {
-    wx.scanCode({
-      onlyFromCamera: true,
-      success(res) {
-        wx.navigateTo({
-          url: '/pages/order-details/scan-result?hxNumber=' + res.result,
-        })
-      },
-      fail(err) {
-        console.error(err)
-        wx.showToast({
-          title: err.errMsg,
-          icon: 'none'
-        })
-      }
-    })
-  },
+  // scanOrderCode() {
+  //   wx.scanCode({
+  //     onlyFromCamera: true,
+  //     success(res) {
+  //       wx.navigateTo({
+  //         url: '/pages/order-details/scan-result?hxNumber=' + res.result,
+  //       })
+  //     },
+  //     fail(err) {
+  //       console.error(err)
+  //       wx.showToast({
+  //         title: err.errMsg,
+  //         icon: 'none'
+  //       })
+  //     }
+  //   })
+  // },
   clearStorage() {
     wx.clearStorageSync()
     wx.showToast({
