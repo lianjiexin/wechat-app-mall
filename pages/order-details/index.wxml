@@ -51,7 +51,7 @@
       </view> -->
       <view class="address-sec">
         <view class="right-box">
-          <view class="text">{{orderDetail.logistics.address}}</view>
+          <view class="text">接受方：{{orderDetail.logistics.address}}</view>
         </view>
       </view>
     </block>

@@ -34,6 +34,13 @@ async function checkHasLogined() {
   return true
 }
 
+/* 查询用户注册码是否绑定 */
+async function getIsRegistryCode() {
+  const registerCode = wx.getStorageSync('uid'),
+    data = await UBT.getUidRegistryByUid(registerCode);
+  return data == null ? false : true;
+}
+
 async function wxaCode() {
   return new Promise((resolve, reject) => {
     wx.login({
@@ -58,7 +65,7 @@ async function getUserInfo() {
         return resolve(res)
       },
       fail: err => {
-        console.error(err)
+        console.log(err)
         return resolve()
       }
     })
@@ -71,9 +78,9 @@ async function login(page) {
     success: function (res) {
       WXAPI.login_wx(res.code).then(function (res) {
         // if (res.code == 10000) {
-          // 去注册
-          //_this.register(page)
-          // return;
+        // 去注册
+        //_this.register(page)
+        // return;
         // }
         // if (res.code != 0) {
         //   // 登录错误
@@ -86,47 +93,45 @@ async function login(page) {
         // }
         wx.setStorageSync('uid', res.data.uid);
         wx.setStorageSync('token', res.data.token);
-        checkUbtAccount(page);
-        /*
-        if ( page ) {
+        // checkUbtAccount(page);
+        if (page) {
           page.onShow()
         }
-        */
       })
     }
   })
 }
 
-async function checkUbtAccount(page) {
-  var uid = wx.getStorageSync('uid');
-  UBT.checkUser(uid).then(function (res) {
-    if (res == null) {
-      wx.showModal({
-        title: '帐号未开通',
-        content: '请联系管理员为您的微信(ID:' + uid +')开通帐号',
-        showCancel: false,
-        success(res) {
-          if (res.confirm) {
-            wx.switchTab({
-              url: "/pages/my/index"
-            })
-          } else {
-            wx.navigateBack()
-          }
-        }
-      })
-      loginOut();
-    } else {
-      if (page) {
-        page.onShow()
-      }
-    }
+// async function checkUbtAccount(page) {
+//   var uid = wx.getStorageSync('uid');
+//   UBT.checkUser(uid).then(function (res) {
+//     if (res == null) {
+//       wx.showModal({
+//         title: '帐号未开通',
+//         content: '请联系管理员为您的微信(ID:' + uid + ')开通帐号',
+//         showCancel: false,
+//         success(res) {
+//           if (res.confirm) {
+//             wx.switchTab({
+//               url: "/pages/my/index"
+//             })
+//           } else {
+//             wx.navigateBack()
+//           }
+//         }
+//       })
+//       loginOut();
+//     } else {
+//       if (page) {
+//         page.onShow()
+//       }
+//     }
 
-  }, function (fail) {
-    console.error(err)
+//   }, function (fail) {
+//     console.error(err)
 
-  })
-}
+//   })
+// }
 
 async function register(page) {
   let _this = this;
@@ -217,6 +222,6 @@ module.exports = {
   login: login,
   register: register,
   loginOut: loginOut,
-  checkAndAuthorize: checkAndAuthorize
-
+  checkAndAuthorize: checkAndAuthorize,
+  getIsRegistryCode: getIsRegistryCode
 }

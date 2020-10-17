@@ -26,6 +26,18 @@ Page({
     peisongType: 'kd', // 配送方式 kd,zq 分别表示快递/到店自取
     remark: ''
   },
+  onLoad(e) {
+    let _data = {
+      isNeedLogistics: 1
+    }
+    if (e.orderType) {
+      _data.orderType = e.orderType
+    }
+    // if (e.pingtuanOpenId) {
+    //   _data.pingtuanOpenId = e.pingtuanOpenId
+    // }
+    this.setData(_data);
+  },
   onShow() {
     AUTH.checkHasLogined().then(isLogined => {
       this.setData({
@@ -59,20 +71,6 @@ Page({
     });
     this.initShippingAddress()
   },
-
-  onLoad(e) {
-    let _data = {
-      isNeedLogistics: 1
-    }
-    if (e.orderType) {
-      _data.orderType = e.orderType
-    }
-    if (e.pingtuanOpenId) {
-      _data.pingtuanOpenId = e.pingtuanOpenId
-    }
-    this.setData(_data);
-  },
-
   getDistrictId: function (obj, aaa) {
     if (!obj) {
       return "";
@@ -82,57 +80,45 @@ Page({
     }
     return aaa;
   },
-  remarkChange(e) {
-    this.data.remark = e.detail.value
-  },
+
   // 发放MUBT
-  goCreateOrder() {
+  async goCreateOrder() {
     const params = this.data.curAddressData;
-    var requestParam =   {
+    if (!params || !params.address) {
+      wx.showToast({
+        title: '请设置接收注册码',
+        icon: 'none'
+      })
+      return;
+    }
+    const ubtParams = {
       "point": this.data.allGoodsPrice,
       "seq": Math.round(Math.random() * 1000000),
-      "type": 'score',
-      "uid": params.uid
+      "type": 'mubt',
+      "uid": params.address
     }
-    const data = ubt.increaseUBT(requestParam)
-    data.then(res => {
+    ubt.increaseUBT(ubtParams).then(res => {
       if (res.status === 0) {
-        const loginToken = wx.getStorageSync('token'); // 用户登录 token
-        WXAPI.shippingCarInfoRemoveAll(loginToken);
-        wx.redirectTo({
-          url: "/pages/order-list/index"
-        })
+        this.createOrder(true);
       }
     })
-    // const subscribe_ids = wx.getStorageSync('subscribe_ids')
-    // if (subscribe_ids) {
-    //   wx.requestSubscribeMessage({
-    //     tmplIds: subscribe_ids.split(','),
-    //     success(res) {
-
-    //     },
-    //     fail(e) {
-    //       console.error(e)
-    //     },
-    //     complete: (e) => {
-    //       this.createOrder(true)
-    //     },
-    //   })
-    // } else {
-    this.createOrder(true)
-    // }
   },
-  createOrder: function (e) {
-    var that = this;
-    var loginToken = wx.getStorageSync('token') // 用户登录 token
-    var remark = this.data.remark; // 备注信息
+  /**
+   * 创建订单
+   * @param {String} e 
+   */
+  createOrder(e) {
+    var that = this,
+      loginToken = wx.getStorageSync('token'),
+      remark = this.data.remark; // 备注信息
 
     let postData = {
-      token: loginToken,
-      goodsJsonStr: that.data.goodsJsonStr,
-      remark: remark,
-      peisongType: that.data.peisongType
+      token: loginToken, // token
+      goodsJsonStr: that.data.goodsJsonStr, // 商品JSON
+      remark: remark, // 备注
+      peisongType: that.data.peisongType  // 配送方式
     };
+
     if (that.data.kjId) {
       postData.kjid = that.data.kjId
     }
@@ -140,14 +126,6 @@ Page({
       postData.pingtuanOpenId = that.data.pingtuanOpenId
     }
     if (that.data.isNeedLogistics > 0 && postData.peisongType == 'kd') {
-      if (!that.data.curAddressData) {
-        wx.hideLoading();
-        wx.showToast({
-          title: '请设置收货地址',
-          icon: 'none'
-        })
-        return;
-      }
       if (postData.peisongType == 'kd') {
         postData.provinceId = that.data.curAddressData.provinceId;
         postData.cityId = that.data.curAddressData.cityId;
@@ -163,6 +141,7 @@ Page({
     if (that.data.curCoupon) {
       postData.couponId = that.data.curCoupon.id;
     }
+    
     if (!e) {
       postData.calculate = "true";
     }
@@ -192,30 +171,12 @@ Page({
         that.getMyCoupons();
         return;
       }
-      that.processAfterCreateOrder(res)
+      setTimeout(() => {
+        wx.redirectTo({
+          url: "/pages/order-list/index"
+        })
+      }, 300)
     })
-  },
-  async processAfterCreateOrder(res) {
-    // 直接弹出支付，取消支付的话，去订单列表
-    // const res1 = await WXAPI.userAmount(wx.getStorageSync('token'))
-    // if (res1.code != 0) {
-    //   wx.showToast({
-    //     title: '无法获取用户资金信息',
-    //     icon: 'none'
-    //   })
-    //   wx.redirectTo({
-    //     url: "/pages/order-list/index"
-    //   });
-    //   return
-    // }
-    // const money = res.data.amountReal * 1 - res1.data.balance * 1
-    // if (money <= 0) {
-    wx.redirectTo({
-      url: "/pages/order-list/index"
-    })
-    // } else {
-    //   wxpay.wxpay('order', money, res.data.id, "/pages/order-list/index");
-    // }
   },
   async initShippingAddress() {
     const res = await WXAPI.defaultAddress(wx.getStorageSync('token'))
@@ -275,15 +236,24 @@ Page({
     });
     this.createOrder();
   },
-  addAddress: function () {
+  /** 添加接收注册码 */
+  addAddress() {
     wx.navigateTo({
       url: "/pages/address-add/index"
     })
   },
+  /** 选择接收注册码 */
   selectAddress: function () {
     wx.navigateTo({
       url: "/pages/select-address/index"
     })
+  },
+  /**
+  * 备注改变
+  * @param {Object} e 
+  */
+  remarkChange(e) {
+    this.data.remark = e.detail.value
   },
   async getMyCoupons() {
     const res = await WXAPI.myCoupons({
@@ -305,20 +275,21 @@ Page({
       }
     }
   },
-  bindChangeCoupon: function (e) {
-    const selIndex = e.detail.value;
-    this.setData({
-      youhuijine: this.data.coupons[selIndex].money,
-      curCoupon: this.data.coupons[selIndex],
-      curCouponShowText: this.data.coupons[selIndex].nameExt
-    });
-  },
-  radioChange(e) {
-    this.setData({
-      peisongType: e.detail.value
-    })
-    this.processYunfei()
-  },
+  // bindChangeCoupon: function (e) {
+  //   const selIndex = e.detail.value;
+  //   this.setData({
+  //     youhuijine: this.data.coupons[selIndex].money,
+  //     curCoupon: this.data.coupons[selIndex],
+  //     curCouponShowText: this.data.coupons[selIndex].nameExt
+  //   });
+  // },
+
+  // radioChange(e) {
+  //   this.setData({
+  //     peisongType: e.detail.value
+  //   })
+  //   this.processYunfei()
+  // },
   cancelLogin() {
     wx.navigateBack()
   },

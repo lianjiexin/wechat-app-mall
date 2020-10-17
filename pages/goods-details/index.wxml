@@ -230,7 +230,7 @@
     </view>
     <image bindtap="addFav" class="fav-icon" src="/images/icon/fav{{faved?'1':'0'}}.svg"></image>
     <view wx:if="{{!goodsDetail.basicInfo.pingtuan}}" class="join-shop-cart" bindtap="{{goodsDetailSkuShowType==0?'toAddShopCar':'addShopCar'}}">加入结算车</view>
-    <view wx:if="{{!goodsDetail.basicInfo.pingtuan}}" class="now-buy"  data-shopType="{{shopType}}" bindtap="{{goodsDetailSkuShowType==0?'tobuy':'buyNow'}}">立即购买</view>
+    <view wx:if="{{!goodsDetail.basicInfo.pingtuan}}" class="now-buy"  data-shopType="{{shopType}}" bindtap="{{goodsDetailSkuShowType==0?'tobuy':'buyNow'}}">立即结算</view>
     <!-- <view wx:if="{{goodsDetail.basicInfo.pingtuan}}" class="join-shop-cart" bindtap="tobuy">单独购买</view>
     <view wx:if="{{goodsDetail.basicInfo.pingtuan}}" class="now-buy" bindtap="toPingtuan">发起拼团</view> -->
   </view>
@@ -274,7 +274,7 @@
         <view class="popup-join-btn">加入结算车</view>
       </view>
       <view class="safeAreaOldPaddingBttom safeAreaNewPaddingBttom" data-shopType="{{shopType}}" wx:if="{{shopType =='tobuy' || shopType =='toPingtuan'}}" bindtap="buyNow">
-        <view class="popup-join-btn">立即购买</view>
+        <view class="popup-join-btn">立即结算</view>
       </view>
     </view>
   </view>
@@ -292,7 +292,7 @@
   </view>
 </block> -->
 
-<!-- <template is="apifmLogin" data="{{wxlogin: wxlogin}}" /> -->
+<template is="apifmLogin" data="{{wxlogin: wxlogin}}" />
 <!-- <float-menu />  -->
 
 

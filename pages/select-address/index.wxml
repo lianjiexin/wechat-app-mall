@@ -17,7 +17,7 @@
   <view class="bottom-box" bindtap="addAddess">
     <view class="add-btn">
       <image src="/images/add-addr.png"></image>
-      <view>新增收货地址</view>
+      <view>新增注册码</view>
     </view>
     <image class="next" src="/images/icon/next.png"></image>
   </view>
