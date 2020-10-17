@@ -1,3 +1,4 @@
+<import src="/template/login/index.wxml" />
 <view class="container">
   <view class="search">
     <input type="text" placeholder="输入搜索关键词" value="{{name}}" bindinput="bindinput" bindconfirm="bindconfirm"></input>
@@ -32,12 +33,13 @@
           </navigator>
         </view>
       </block>
-      
       <view class="goods" wx:for="{{currentGoods}}" wx:key="id">
         <image mode="aspectFill" class="pic" src="{{item.pic}}" data-id='{{item.id}}' bindtap="toDetailsTap">
           <!-- <image class='fresh-tag' src="/images/goods-description/fresh.png"></image> -->
         </image>
-        <view class="name ellipsis" data-id='{{item.id}}' bindtap="toDetailsTap">{{item.name}}</view>
+        <view class="name ellipsis" data-id='{{item.id}}' bindtap="toDetailsTap">
+          {{item.name}}
+        </view>
         <view class='soldInfo'>
           <view class='good-price-box'>
             <text class="price">{{item.minPrice}}MUBT</text>
@@ -54,8 +56,6 @@
     </scroll-view>
   </view>
 </view>
-
-
 <block wx:if="{{skuCurGoods}}">
   <view class="sku-mask"></view>
   <view class="sku-container">
@@ -63,7 +63,9 @@
     <view class="sku" wx:for="{{skuCurGoods.properties}}" wx:key="id">
       <view class="t">{{item.name}}</view>
       <view class="items">
-        <text class="{{small.active? 'active' : ''}}" wx:for="{{item.childsCurGoods}}" wx:for-item="small" wx:key="id" data-pid="{{small.propertyId}}" data-id="{{small.id}}" bindtap="skuSelect">{{small.name}}</text>
+        <text class="{{small.active? 'active' : ''}}" wx:for="{{item.childsCurGoods}}" wx:for-item="small" wx:key="id" data-pid="{{small.propertyId}}" data-id="{{small.id}}" bindtap="skuSelect">
+          {{small.name}}
+        </text>
       </view>
     </view>
     <view class="num">
@@ -77,3 +79,4 @@
   </view>
   <view class="sku-btn" bindtap="addCarSku">加入结算车</view>
 </block>
+<template is="apifmLogin" data="{{wxlogin: wxlogin}}" />

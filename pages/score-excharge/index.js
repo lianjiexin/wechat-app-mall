@@ -9,74 +9,75 @@ Page({
    * 页面的初始数据
    */
   data: {
-    uid: undefined
+    uid: undefined,
+    ubt: "",
+    maxUbt: 0,
+    number: "",
+    maxNumber: 0
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
-  },
+  onLoad: function (options) { },
 
   /**
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    AUTH.checkHasLogined().then(isLogined => {
-      if (!isLogined) {
-        wx.showModal({
-          title: '提示',
-          content: '本次操作需要您的登录授权',
-          cancelText: '暂不登录',
-          confirmText: '前往登录',
-          success(res) {
-            if (res.confirm) {
-              wx.switchTab({
-                url: "/pages/my/index"
-              })
-            } else {
-              wx.navigateBack()
-            }
-          }
-        })
-      }
+    this.init()
+  },
+
+  // 初始化
+  init() {
+    const _self = this,
+      registerCode = wx.getStorageSync('registerCode');
+    this.setData({
+      ubt: "",
+      number: ""
+    })
+    UBT.retrieveUBT(registerCode, 'ubt').then(function (res) {
+      _self.setData({
+        maxUbt: res.data && res.data.point ? res.data.point : 0
+      });
+    })
+    UBT.retrieveUBT(registerCode, 'mubt').then(function (res) {
+      _self.setData({
+        maxNumber: res.data && res.data.point ? res.data.point : 0
+      });
     })
   },
+
   bindSave: function (e) {
-    const ubt = e.detail.value.amount,
-      isNumber = /^(0|[1-9][0-9]*)$/;
+    const _self = this,
+      isNumber = /^(0|[1-9][0-9]*)$/,
+      registerCode = wx.getStorageSync('registerCode');
+    let ubt = e.detail.value.amount;
     ubt.replace(/\s+/g, "");
     if (!ubt || !isNumber.test(ubt)) {
       wx.showToast({
-        title: !ubt ? '请输入UBT数量' : '请输入正确数量',
+        title: !ubt ? '请输入ubt数量' : '请输入正确数量',
         icon: 'none'
       })
       return
     }
 
-    const uid = wx.getStorageSync('uid')
-    UBT.exchangeUBTtoScore(uid, ubt).then(function (res) {
+    if (Number(ubt) > _self.data.maxUbt) {
+      wx.showToast({
+        title: '超出持有额',
+        icon: 'none'
+      })
+      return
+    }
+
+    UBT.exchangeUBTtoScore(registerCode, Number(ubt), 'mubt').then(res => {
       if (res.status == 0) {
         wx.showModal({
-          title: '成功',
-          content: '恭喜您，成功兑换' + res.mubt + 'MUBT',
+          // title: '成功',
+          content: `成功兑换 ${res.number} MUBT`,
           showCancel: false,
           success(res) {
-            if (res.confirm) {
-              wx.switchTab({
-                url: "/pages/my/index"
-              })
-            } else {
-              wx.navigateBack()
-            }
+            if (res.confirm) _self.init();
           }
         })
         return
@@ -88,9 +89,44 @@ Page({
       }
     })
   },
-  cancelLogin() {
-    this.setData({
-      wxlogin: true
+
+  bindSave1(e) {
+    const _self = this,
+      isNumber = /^(0|[1-9][0-9]*)$/,
+      registerCode = wx.getStorageSync('registerCode');
+    let number = e.detail.value.score;
+    number.replace(/\s+/g, "");
+    if (!number || !isNumber.test(number)) {
+      wx.showToast({
+        title: !number ? '请输入数量' : '请输入正确数量',
+        icon: 'none'
+      })
+      return
+    }
+    if (Number(number) > _self.data.maxNumber) {
+      wx.showToast({
+        title: '超出持有额',
+        icon: 'none'
+      })
+      return
+    }
+    UBT.exchangeScoreToUBT(registerCode, Number(number), 'mubt').then(res => {
+      if (res.status == 0) {
+        wx.showModal({
+          // title: '成功',
+          content: `成功兑换 ${res.ubt} UBT`,
+          showCancel: false,
+          success(res) {
+            if (res.confirm) _self.init();
+          }
+        })
+        return
+      } else {
+        wx.showToast({
+          title: "兑换失败",
+          icon: 'none'
+        })
+      }
     })
-  }
+  },
 })

@@ -1,7 +1,25 @@
 const WXAPI = require('apifm-wxapi')
+const AUTH = require('./auth')
 
 // 显示购物车tabBar的Badge
-function showTabBarBadge(){
+async function showTabBarBadge() {
+
+  const isLogined = await AUTH.checkHasLogined();
+  if (isLogined) {
+    const state = await AUTH.getIsRegistryCode()
+    if (!state) {
+      wx.removeTabBarBadge({
+        index: 2
+      });
+      return
+    }
+  } else {
+    wx.removeTabBarBadge({
+      index: 2
+    });
+    return
+  }
+
   const token = wx.getStorageSync('token')
   if (!token) {
     return

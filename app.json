@@ -21,7 +21,6 @@
     "pages/my/index",
     "pages/withdraw/index",
     "pages/score-excharge/index",
-    "pages/score-excharge/growth",
     "pages/asset/index",
     "pages/sign/index",
     "pages/maidan/index",
@@ -32,7 +31,8 @@
     "pages/coupons/index",
     "pages/invoice/list",
     "pages/invoice/apply",
-    "pages/deposit/pay"
+    "pages/deposit/pay",
+    "pages/binding/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -83,7 +83,7 @@
   ],
   "usingComponents": {
     "float-menu": "/components/float-menu/index",
-    "parser":"/components/parser.20200414.min/parser",
+    "parser": "/components/parser.20200414.min/parser",
     "van-notice-bar": "@vant/weapp/notice-bar/index",
     "van-search": "@vant/weapp/search/index",
     "van-divider": "@vant/weapp/divider/index",

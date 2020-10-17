@@ -29,7 +29,7 @@
 }
 
 .a-address .left-text .address-box {
-  font-size: 24rpx;
+  font-size: 34rpx;
   color: #888;
   line-height: 36rpx;
 }

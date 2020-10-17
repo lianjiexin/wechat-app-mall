@@ -97,7 +97,7 @@ Page({
     })
     this.fetchTabData(this.data.activeIndex)
   },
-  fetchTabData(activeIndex){
+  fetchTabData(activeIndex) {
     if (activeIndex == 0) {
       this.cashLogs()
     }
@@ -112,8 +112,8 @@ Page({
     const _this = this
     WXAPI.cashLogsV2({
       token: wx.getStorageSync('token'),
-      page:1,
-      pageSize:50
+      page: 1,
+      pageSize: 50
     }).then(res => {
       if (res.code == 0) {
         _this.setData({
@@ -126,8 +126,8 @@ Page({
     const _this = this
     WXAPI.withDrawLogs({
       token: wx.getStorageSync('token'),
-      page:1,
-      pageSize:50
+      page: 1,
+      pageSize: 50
     }).then(res => {
       if (res.code == 0) {
         _this.setData({
@@ -140,8 +140,8 @@ Page({
     const _this = this
     WXAPI.depositList({
       token: wx.getStorageSync('token'),
-      page:1,
-      pageSize:50
+      page: 1,
+      pageSize: 50
     }).then(res => {
       if (res.code == 0) {
         _this.setData({
@@ -173,12 +173,12 @@ Page({
     });
     this.fetchTabData(e.currentTarget.id)
   },
-  cancelLogin(){
+  cancelLogin() {
     wx.switchTab({
       url: '/pages/my/index'
     })
   },
-  processLogin(e){
+  processLogin(e) {
     if (!e.detail.userInfo) {
       wx.showToast({
         title: '已取消',
