@@ -123,6 +123,27 @@
           "id": -1,
           "name": "notice",
           "pathName": "pages/notice/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/select-address/index",
+          "pathName": "pages/select-address/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/address-add/index",
+          "pathName": "pages/address-add/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "id": -1,
+          "name": "pages/shop-cart/index",
+          "pathName": "pages/shop-cart/index",
           "scene": null
         }
       ]

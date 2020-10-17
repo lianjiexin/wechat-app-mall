@@ -38,15 +38,16 @@ Page({
     this.initEleWidth();
     this.onShow();
   },
-  onShow: function () {
-    AUTH.checkHasLogined().then(isLogined => {
-      this.setData({
-        wxlogin: isLogined
-      })
-      if (isLogined) {
-        this.shippingCarInfo()
-      }
+  onShow: async function () {
+    const _self = this,
+      isLogined = await AUTH.checkHasLogined();
+    _self.setData({
+      wxlogin: isLogined
     })
+    if (isLogined) {
+      const state = await AUTH.getIsRegistryCode()
+      if (state) this.shippingCarInfo()
+    }
   },
   async shippingCarInfo() {
     const token = wx.getStorageSync('token')
@@ -54,7 +55,6 @@ Page({
       return
     }
     const res = await WXAPI.shippingCarInfo(token)
-    
     if (res.code == 0) {
       this.setData({
         shippingCarInfo: res.data

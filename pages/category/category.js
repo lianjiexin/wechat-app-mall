@@ -7,6 +7,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    wxlogin: true,
     categories: [],
     categorySelected: {
       name: '',
@@ -21,7 +22,7 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function(options) {
+  onLoad: function (options) {
     wx.showShareMenu({
       withShareTicket: true
     })
@@ -82,12 +83,12 @@ Page({
       currentGoods: res.data
     });
   },
-  toDetailsTap: function(e) {
+  toDetailsTap: function (e) {
     wx.navigateTo({
       url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
     })
   },
-  onCategoryClick: function(e) {
+  onCategoryClick: function (e) {
     var that = this;
     var id = e.target.dataset.id;
     if (id === that.data.categorySelected.id) {
@@ -126,7 +127,7 @@ Page({
       url: '/pages/goods/list?name=' + this.data.inputVal,
     })
   },
-  onShareAppMessage() {    
+  onShareAppMessage() {
     return {
       title: '"' + wx.getStorageSync('mallName') + '" ' + wx.getStorageSync('share_profile'),
       path: '/pages/index/index?inviter_id=' + wx.getStorageSync('uid')
@@ -135,9 +136,6 @@ Page({
   onShow() {
     AUTH.checkHasLogined().then(isLogined => {
       if (isLogined) {
-        this.setData({
-          wxlogin: isLogined
-        })
         TOOLS.showTabBarBadge() // 获取购物车数据，显示TabBarBadge
       }
     })
@@ -151,7 +149,29 @@ Page({
     }
   },
   async addShopCar(e) {
-    const curGood = this.data.currentGoods.find(ele => {
+
+    const _self = this,
+      isLogined = await AUTH.checkHasLogined();
+    if (isLogined) {
+      _self.setData({
+        wxlogin: isLogined
+      })
+      const state = await AUTH.getIsRegistryCode()
+      if (!state) {
+        wx.navigateTo({
+          url: '/pages/binding/index?wxBindingState=1',
+          success: res => { }
+        })
+        return
+      }
+    } else {
+      _self.setData({
+        wxlogin: isLogined
+      })
+      return
+    }
+
+    const curGood = _self.data.currentGoods.find(ele => {
       return ele.id == e.currentTarget.dataset.id
     })
     if (!curGood) {
@@ -164,24 +184,24 @@ Page({
       })
       return
     }
-    this.addShopCarCheck({
+    _self.addShopCarDone({
       goodsId: curGood.id,
       buyNumber: 1,
       sku: []
     })
   },
-  async addShopCarCheck(options){
-    AUTH.checkHasLogined().then(isLogined => {
-      this.setData({
-        wxlogin: isLogined
-      })
-      if (isLogined) {
-        // 处理加入购物车的业务逻辑
-        this.addShopCarDone(options)
-      }
-    })
-  },
-  async addShopCarDone(options){
+  // async addShopCarCheck(options) {
+  //   AUTH.checkHasLogined().then(isLogined => {
+  //     this.setData({
+  //       wxlogin: isLogined
+  //     })
+  //     if (isLogined) {
+  //       // 处理加入购物车的业务逻辑
+  //       this.addShopCarDone(options)
+  //     }
+  //   })
+  // },
+  async addShopCarDone(options) {
     const res = await WXAPI.shippingCarInfoAddItem(wx.getStorageSync('token'), options.goodsId, options.buyNumber, options.sku)
     if (res.code == 30002) {
       // 需要选择规格尺寸
@@ -218,7 +238,7 @@ Page({
     wx.showTabBar()
     TOOLS.showTabBarBadge() // 获取购物车数据，显示TabBarBadge
   },
-  storesJia(){
+  storesJia() {
     const skuCurGoods = this.data.skuCurGoods
     if (skuCurGoods.basicInfo.storesBuy < skuCurGoods.basicInfo.stores) {
       skuCurGoods.basicInfo.storesBuy++
@@ -227,7 +247,7 @@ Page({
       })
     }
   },
-  storesJian(){
+  storesJian() {
     const skuCurGoods = this.data.skuCurGoods
     if (skuCurGoods.basicInfo.storesBuy > 1) {
       skuCurGoods.basicInfo.storesBuy--
@@ -236,18 +256,18 @@ Page({
       })
     }
   },
-  closeSku(){
+  closeSku() {
     this.setData({
       skuCurGoods: null
     })
     wx.showTabBar()
   },
-  skuSelect(e){
+  skuSelect(e) {
     const pid = e.currentTarget.dataset.pid
     const id = e.currentTarget.dataset.id
     // 处理选中
     const skuCurGoods = this.data.skuCurGoods
-    const property = skuCurGoods.properties.find(ele => {return ele.id == pid})
+    const property = skuCurGoods.properties.find(ele => { return ele.id == pid })
     property.childsCurGoods.forEach(ele => {
       if (ele.id == id) {
         ele.active = true
@@ -259,13 +279,13 @@ Page({
       skuCurGoods
     })
   },
-  addCarSku(){
+  addCarSku() {
     const skuCurGoods = this.data.skuCurGoods
     const propertySize = skuCurGoods.properties.length // 有几组SKU
     const sku = []
     skuCurGoods.properties.forEach(p => {
-      const o = p.childsCurGoods.find(ele => {return ele.active})
-      if (!o) {        
+      const o = p.childsCurGoods.find(ele => { return ele.active })
+      if (!o) {
         return
       }
       sku.push({
@@ -286,5 +306,20 @@ Page({
       sku
     }
     this.addShopCarDone(options)
+  },
+  cancelLogin() {
+    this.setData({
+      wxlogin: true
+    })
+  },
+  processLogin(e) {
+    if (!e.detail.userInfo) {
+      wx.showToast({
+        title: '已取消',
+        icon: 'none',
+      })
+      return;
+    }
+    AUTH.register(this);
   },
 })

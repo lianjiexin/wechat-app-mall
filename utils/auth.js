@@ -38,7 +38,7 @@ async function checkHasLogined() {
 async function getIsRegistryCode() {
   const registerCode = wx.getStorageSync('uid'),
     data = await UBT.getUidRegistryByUid(registerCode);
-  return data == null ? false : true
+  return data == null ? false : true;
 }
 
 async function wxaCode() {
@@ -65,7 +65,7 @@ async function getUserInfo() {
         return resolve(res)
       },
       fail: err => {
-        console.error(err)
+        console.log(err)
         return resolve()
       }
     })
@@ -222,6 +222,6 @@ module.exports = {
   login: login,
   register: register,
   loginOut: loginOut,
-  checkAndAuthorize: checkAndAuthorize
-
+  checkAndAuthorize: checkAndAuthorize,
+  getIsRegistryCode: getIsRegistryCode
 }

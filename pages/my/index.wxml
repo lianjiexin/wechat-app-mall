@@ -31,21 +31,21 @@
       <image class="next" src="/images/icon/next.png"></image>
     </view>
   </navigator>
-  <view class="space"></view>
-  <navigator url="/pages/order-list/index">
+  <view class="space" wx:if="{{wxloginState}}"></view>
+  <navigator url="/pages/order-list/index" wx:if="{{wxBindingState}}">
     <view class="menu-item">
       <view class="l">我的结算单</view>
       <image class="next" src="/images/icon/next.png"></image>
     </view>
   </navigator>
-  <view class="line"></view>
-  <navigator url="/pages/score-excharge/index">
+  <view class="line" wx:if="{{wxBindingState}}"></view>
+  <navigator url="/pages/score-excharge/index" wx:if="{{wxBindingState}}">
     <view class="menu-item">
       <view class="l">兑换</view>
       <image class="next" src="/images/icon/next.png"></image>
     </view>
   </navigator>
-  <view class="space"></view>
+  <view class="space" wx:if="{{wxBindingState}}"></view>
   <view class="menu-item" bindtap="aboutUs">
     <view class="l">关于我们</view>
     <image class="next" src="/images/icon/next.png"></image>

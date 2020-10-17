@@ -292,7 +292,7 @@
   </view>
 </block> -->
 
-<!-- <template is="apifmLogin" data="{{wxlogin: wxlogin}}" /> -->
+<template is="apifmLogin" data="{{wxlogin: wxlogin}}" />
 <!-- <float-menu />  -->
 
 
